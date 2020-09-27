@@ -1,0 +1,7 @@
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+.cache/
+public/data/tenders_data
+public/data/tenders_data_eu
