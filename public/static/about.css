@@ -282,6 +282,18 @@ div.dc-html-legend {
     float: left;
   }
 }
+@media (max-width: 992px) {
+  .col-md-5ths {
+    width: 33%;
+    float: left;
+  }
+}
+@media (max-width: 768px) {
+  .col-md-5ths {
+    width: 100%;
+    float: left;
+  }
+}
 @media (min-width: 1200px) {
   .col-lg-5ths {
     width: 20%;
@@ -739,9 +751,24 @@ table.dataTable thead .sorting_desc_disabled {
 .dataTables_wrapper th {
   color: #17a2b8;
   text-align: left;
+  font-size: 15px;
+  min-width: 150px;
 }
 .dataTables_wrapper td {
   text-align: left;
+  font-size: 13px;
+}
+.dataTables_wrapper th:nth-child(1), .dataTables_wrapper td:nth-child(1) {
+  min-width: 50px;
+  max-width: 50px;
+}
+.dataTables_wrapper th:nth-child(3), .dataTables_wrapper td:nth-child(3) {
+  min-width: 150px;
+}
+.dataTables_wrapper th:nth-child(8), .dataTables_wrapper td:nth-child(8) {
+  text-align: center;
+  min-width: 100px;
+  max-width: 100px;
 }
 .dataTables_wrapper .dataTables_info {
   width: 40%;
@@ -887,8 +914,9 @@ table.dataTable tbody tr:hover {
   border-bottom: 1px solid #eee;
   font-size: 12px;
   cursor: pointer;
+  transition: all 0.1s;
 }
-.institution-list-el.selected {
+.institution-list-el.selected, .institution-list-el:hover {
   background: #117a8b;
   color: #fff;
 }
@@ -938,12 +966,15 @@ table.dataTable tbody tr:hover {
   position: absolute;
   bottom: 30px;
   left: 30px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 15px 20px;
+  border-radius: 3px;
 }
 
 .chotopleth-type-buttons-container {
   max-width: 200px;
   text-align: left;
-  padding: 15px 0;
+  padding: 0px 0 15px 0;
   border-bottom: 2px solid #ccc;
   margin-bottom: 15px;
 }
@@ -970,6 +1001,9 @@ table.dataTable tbody tr:hover {
   background: #117a8b;
 }
 
+.toggle-cities-container {
+  text-align: left;
+}
 .toggle-cities-container .toggle-cities-circle {
   display: inline-block;
   background: #078298;
@@ -983,7 +1017,13 @@ table.dataTable tbody tr:hover {
 .toggle-cities-container .toggle-cities-text {
   display: inline-block;
   vertical-align: middle;
+  font-size: 14px;
+  font-weight: 500;
 }
+.toggle-cities-container .toggle-cities-btn {
+  margin-top: 10px;
+}
+
 .modal-title .modal-title-ntitle {
   text-align: left;
   color: #117a8b;
@@ -1063,6 +1103,30 @@ table.dataTable tbody tr:hover {
   padding: 15px;
   margin: 10px auto;
   font-size: 13px;
+}
+
+.table-flags-num {
+  color: #fff;
+  font-weight: 600;
+  border-radius: 30px;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  padding: 4px;
+  display: inline-block;
+}
+.table-flags-num.table-flags-num-red {
+  background: #d11b4b;
+}
+.table-flags-num.table-flags-num-blue {
+  background: #117a8b;
+}
+
+/* MOBILE FIXES */
+@media only screen and (max-width: 1200px) {
+  .dataTables_wrapper th:nth-child(2), .dataTables_wrapper th:nth-child(5), .dataTables_wrapper th:nth-child(7), .dataTables_wrapper td:nth-child(2), .dataTables_wrapper td:nth-child(5), .dataTables_wrapper td:nth-child(7) {
+    display: none;
+  }
 }.container {
   padding: 30px 0;
   padding-bottom: 50px;
@@ -1075,7 +1139,8 @@ table.dataTable tbody tr:hover {
   margin-bottom: 10px;
 }
 .panel-group .panel .panel-heading {
-  background: #fafafa;
+  background: #117a8b;
+  color: #fff;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
@@ -1086,7 +1151,7 @@ table.dataTable tbody tr:hover {
   padding: 15px 30px;
   font-size: 20px;
   text-align: left;
-  color: #205d85;
+  color: #fff;
   text-decoration: none;
 }
 .panel-group .panel .panel-collapse .panel-body {
@@ -1094,7 +1159,7 @@ table.dataTable tbody tr:hover {
   padding: 15px 30px 30px 30px;
 }
 .panel-group .panel .panel-collapse .panel-body a {
-  color: #3d95d1;
+  color: #117a8b;
   font-weight: bold;
 }
 .panel-group .panel .panel-collapse .panel-body a img.logo {
@@ -1108,9 +1173,15 @@ table.dataTable tbody tr:hover {
   font-size: 18px;
   margin-top: 25px;
   font-weight: 600;
+  color: #c1274e;
 }
 .panel-group .panel .panel-collapse .panel-body h3.mt-0 {
   margin-top: 0;
+}
+.panel-group .panel .panel-collapse .panel-body h3.subtitle-bigger {
+  font-size: 22px;
+  font-weight: 500;
+  color: #117a8b;
 }
 .panel-group .panel .panel-collapse .panel-body h4 {
   font-size: 16px;
@@ -1118,7 +1189,7 @@ table.dataTable tbody tr:hover {
   margin-top: 20px;
 }
 .panel-group .panel.panel-static .panel-heading {
-  background: #3d95d1;
+  background: #c1274e;
 }
 .panel-group .panel.panel-static .panel-heading a {
   color: #fff;
@@ -1143,7 +1214,7 @@ table.dataTable tbody tr:hover {
   padding-bottom: 50px;
   font-family: "Montserrat", sans-serif;
   text-align: center;
-  background: #3b95d0;
+  background: #117a8b;
   min-height: 100vh;
   color: #fff;
   display: flex;
@@ -1156,7 +1227,7 @@ table.dataTable tbody tr:hover {
   width: 90%;
   max-width: 600px;
   border-radius: 10px;
-  color: #3b95d0;
+  color: #117a8b;
 }
 .container-404 .title {
   font-size: 80px;
@@ -1171,6 +1242,67 @@ table.dataTable tbody tr:hover {
 .container-404 .cta a {
   color: #fff;
   background: #3b95d0;
+  display: block;
+  padding: 5px 20px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 20px;
+}
+
+/* WIP Page */
+.wip-container {
+  padding: 30px 0;
+  padding-bottom: 50px;
+  font-family: "Montserrat", sans-serif;
+  text-align: center;
+  background: #117a8b;
+  min-height: 100vh;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wip-container .logo {
+  margin-bottom: 25px;
+}
+.wip-container .logo img {
+  width: 300px;
+  max-width: 90%;
+}
+.wip-container .content {
+  background: white;
+  padding: 30px;
+  width: 90%;
+  max-width: 850px;
+  border-radius: 3px;
+  color: #333;
+}
+.wip-container .title {
+  font-size: 80px;
+  color: #c1274e;
+  font-size: 40px;
+  line-height: 130%;
+}
+.wip-container .subtitle {
+  font-size: 20px;
+  padding: 30px 0;
+}
+.wip-container .contact {
+  margin-bottom: 25px;
+}
+.wip-container .contact a {
+  text-decoration: none;
+  color: #117a8b;
+  font-weight: 600;
+}
+.wip-container .cta {
+  margin: 30px auto;
+  max-width: 400px;
+}
+.wip-container .cta a {
+  color: #fff;
+  background: #117a8b;
   display: block;
   padding: 5px 20px;
   border-radius: 3px;
@@ -1207,7 +1339,7 @@ table.dataTable tbody tr:hover {
   animation: spin-data-v-c7e73c 2s linear infinite;
 }
 .overlay .loader-container .loader-text[data-v-c7e73c] {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
 }
 .overlay .loader-container .loader-text.below[data-v-c7e73c] {

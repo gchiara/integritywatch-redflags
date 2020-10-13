@@ -26,6 +26,7 @@ import ChartHeader from './components/ChartHeader.vue';
 
 var vuedata = {
   page: 'redflags',
+  loaderText: 'This user-friendly application provides a unique overview of public procurement by EU institutions and projects funded by the EU budget since the 1st of January 2017. Integrity Watch: Red Flags draws attention to potential fraud risks at the beginning and at the end of a procurement process. Contract notices and contract award notices published on the EU\'s Tenders Electronic Database are flagged for potential risk factors.',
   oldcommission: false,
   loader: true,
   showInfo: true,
@@ -40,33 +41,33 @@ var vuedata = {
   charts: {
     dotsMap: {
       title: 'Map',
-      info: 'Description'
+      info: 'The colour of the countries is based on the share of flagged notices per total number of contract notices and contract award notices published in each EU member state, or on the total number of notices if the “number of notices” button is selected. The blue dots represent the cities in which EU institutions are present. Click on any country or city to sort the the main table and graphs below.'
     },
     ctype: {
       title: 'Contract type',
-      info: 'Description'
+      info: 'Category of contract by total number of contracts published. The shares of the pie chart indicate the total number of published contracts for the acquisiting of goods, services or works. This graph adapts dynamically according to the elements selected in the other charts.'
     },
     sector: {
       title: 'Top Sectors',
-      info: 'Description'
+      info: 'Top 15 economic sectors by number of notices. The economic sector is based on the CPV code list mandatory for all EU-based procurement processes to describe the exact nature of purchases by public authorities. This graph adapts dynamically according to the elements selected in the other charts.'
     },
     authType: {
       title: 'Authority Type',
-      info: 'Description'
+      info: 'Type of contracting authority by total number of contracts published. The shares of the pie chart indicate the total number of contracts published by a given authority. Contracting bodies other than EU insitutions / agencies are EU-funded procurement notices published by national authorities. This graph adapts dynamically according to the elements selected in the other charts.'
     },
     flagsNum: {
       title: 'Flags Number',
-      info: 'Description'
+      info: 'Number of flags per contract notice and contract award notice. Higher flag counts signal a higher risk and warrant further scrutiny. This graph adapts dynamically according to the elements selected in the other charts.'
     },
     flagsType: {
-      title: 'Flags Type',
-      info: 'Description'
+      title: 'Top Flags Type',
+      info: 'Top 15 types of red flags by number of notices. Flags are indicators that signal risk factors in each published procurement notice. Consult the about section for the full explanation and description of the flags. This graph adapts dynamically according to the elements selected in the other charts.'
     },
     table: {
       chart: null,
       type: 'table',
       title: 'Notices',
-      info: ''
+      info: 'List of EU-funded contract notices and contract award notices. Click on any notice to see additional details and the list of corresponding red flags. Links the TED database notices are provided in each individual panel. We advise to always consult the source notice before re-using Integrity Watch: Red flags data.'
     }
   },
   flagsTypes: {
@@ -339,9 +340,7 @@ new Vue({
       for (var i = 0; i < args.length; i++) {
         if(currentPath[args[i]]) {
           currentPath = currentPath[args[i]];
-          //console.log(currentPath);
         } else {
-          //console.log("path not found: " + args[i] + " Full: " + pathString);
           return false;
         }
       }
@@ -353,10 +352,7 @@ new Vue({
       for (var i = 0; i < args.length; i++) {
         if(currentPath[args[i]]) {
           currentPath = currentPath[args[i]];
-          //console.log("lotPATH: ");
-          //console.log(currentPath);
         } else {
-          //console.log("path not found: " + args[i] + " Full: " + pathString);
           return false;
         }
       }
@@ -376,13 +372,10 @@ new Vue({
       return false;
     },
     findTedUrl: function(uriList) {
-      console.log("Url function");
-      console.log(uriList);
       var html = "ttt";
       if(uriList && Array.isArray(uriList) && uriList.length > 0) {
         _.each(uriList, function (url) {
           if(url.indexOf(":TEXT:EN:HTML") > -1) {
-            console.log(url);
             html = "<a href='" + url + "' target='_blank'>" + url + "</a>";
           }
         });
@@ -572,12 +565,15 @@ var tendersDataFile = './data/tenders_eu.json';
 var citiesDataFile = './data/cities_geocoded_eu.json';
 var europeMap = './data/europe.geo.json';
 var sectorCodesFile = './data/CPV_codes.csv';
+var countriesNamesFile = './data/countries_names.csv';
 
 //Load tenders data
-json(tendersDataFile + '?' + randomPar, (err, tenders) => {
+//json(tendersDataFile + '?' + randomPar, (err, tenders) => {
+  json(tendersDataFile, (err, tenders) => {
   json(citiesDataFile + '?' + randomPar, (err, cities) => {
-    json(europeMap, (err, europeGeojson) => {
+    json(europeMap + '?' + randomPar, (err, europeGeojson) => {
       csv(sectorCodesFile, (err, sectorCodes) => {
+      csv(countriesNamesFile, (err, countriesNames) => {
         if (err) {
           console.error(err)
         }
@@ -609,6 +605,32 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
           }
           //Save cities and countries stats
           //countriesStats, citiesStats
+          if(d.cb_town && d.cb_name_fixed) {
+            if(!vuedata.citiesStats[d.cb_town]) {
+              vuedata.citiesStats[d.cb_town] = {
+                tenders: 0,
+                tendersTot: 0,
+                flaggedTenders: 0,
+                totFlags: 0
+              }
+            }
+            vuedata.citiesStats[d.cb_town].tenders ++;
+            vuedata.citiesStats[d.cb_town].totFlags += d.flags.length;
+            if(d.flags.length > 0) {
+              vuedata.citiesStats[d.cb_town].flaggedTenders ++;
+            }
+          }
+          if(d.cb_town) {
+            if(!vuedata.citiesStats[d.cb_town]) {
+              vuedata.citiesStats[d.cb_town] = {
+                tenders: 0,
+                tendersTot: 0,
+                flaggedTenders: 0,
+                totFlags: 0
+              }
+            }
+            vuedata.citiesStats[d.cb_town].tendersTot ++;
+          }
           if(!vuedata.countriesStats[d.CY]) {
             vuedata.countriesStats[d.CY] = {
               tenders: 0,
@@ -616,22 +638,11 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
               totFlags: 0
             }
           }
-          if(!vuedata.citiesStats[d.cb_town]) {
-            vuedata.citiesStats[d.cb_town] = {
-              tenders: 0,
-              flaggedTenders: 0,
-              totFlags: 0
-            }
-          }
-          vuedata.citiesStats[d.cb_town].tenders ++;
           vuedata.countriesStats[d.CY].tenders ++;
           if(d.flags.length > 0) {
-            vuedata.citiesStats[d.cb_town].flaggedTenders ++;
             vuedata.countriesStats[d.CY].flaggedTenders ++;
           }
-          vuedata.citiesStats[d.cb_town].totFlags += d.flags.length;
           vuedata.countriesStats[d.CY].totFlags += d.flags.length;
-          //console.log(d.tender_file_uid + " - " + d.flags);
           //Codes and acroynms
           d.authorityType = vuedata.codes.AA[d.AA];
           //d.awardCriteria = vuedata.codes.AC[d.AC];
@@ -639,10 +650,10 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
           if(!d.legalBasis) {
             d.legalBasis = d.DI;
           }
-          d.mainActivities = vuedata.codes.MA[d.MA];
+          //d.mainActivities = vuedata.codes.MA[d.MA];
           d.contractType = vuedata.codes.NC[d.NC];
           d.procedureType = vuedata.codes.PR[d.PR];
-          d.marketRegulation = vuedata.codes.RP[d.RP];
+          //d.marketRegulation = vuedata.codes.RP[d.RP];
           d.documentType = vuedata.codes.TD[d.TD];
           d.bidType = vuedata.codes.TY[d.TY];
           d.europeanInstitutions = vuedata.codes.HA[d.HA];
@@ -659,9 +670,9 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
             });
           }
         });
-        console.log(tenders);
-        console.log(vuedata.countriesStats);
-        console.log(vuedata.citiesStats);
+        //console.log(tenders);
+        //console.log(vuedata.countriesStats);
+        //console.log(vuedata.citiesStats);
 
         //Set dc main vars
         var ndx = crossfilter(tenders);
@@ -669,15 +680,19 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
         //Can then get the dataset to use for example for the map parsing like this: searchDimension.top(Infinity)
         var searchDimension = ndx.dimension(function (d) {
           var entryString = "iso2:" + d.CY + " i_name:" + d.cb_name + " i_type:" + d.authorityType + " i_town:" + d.cb_town + " title:" + d.title;
+          if(d.cb_name_fixed) {
+            entryString = "iso2:" + d.CY + " i_name:" + d.cb_name + " i_name2:" + d.cb_name_fixed.trim() + " i_type:" + d.authorityType + " i_town:" + d.cb_town.trim() + " title:" + d.title;
+          }
           return entryString.toLowerCase();
         });
         //When clicking on institution in list apply filter, like for search
         $('#map-side-panel').on('click', '.selected-city-container .institution-list-el', function () {
-          var instName = $(this).text().trim();
+          var cityName = $('#map-side-panel .chart-title').text().trim().toLowerCase();
+          var instName = $(this).text().trim().toLowerCase();
           $('.institution-list-el').removeClass('selected');
           $(this).addClass('selected');
           searchDimension.filter(function(d) { 
-            return d.indexOf(instName.toLowerCase()) !== -1;
+            return d.indexOf("i_name2:" + instName) !== -1 && d.indexOf("i_town:" + cityName) !== -1;
           });
           throttle();
           var throttleTimer;
@@ -698,7 +713,11 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
           var tendersNum = currentData.length;
           var flaggedTendersNum = 0;
           var flagsNum = 0;
+          console.log(iso2 + " - " + tendersNum);
           if(tendersNum == 0) {
+            //Save data for tooltip
+            vuedata.tooltipData[iso2] = {};
+            vuedata.tooltipData[iso2].tendersNum = tendersNum;
             return "#bbb";
           } else {
             _.each(currentData, function (d) {
@@ -712,7 +731,6 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
             vuedata.tooltipData[iso2].tendersNum = tendersNum;
             vuedata.tooltipData[iso2].flaggedTendersNum = flaggedTendersNum;
             vuedata.tooltipData[iso2].flagsNum = flagsNum;
-            console.log(iso2 + ": Tenders:" + tendersNum + " - Flags:" + flagsNum + " Flagged tenders: " + flaggedTendersNum);
             if(vuedata.choroplethType == 'percentFlagged') {
               //Calc percentage of flags
               var flagsPercentage = (flagsNum*100)/tendersNum;
@@ -720,9 +738,18 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
               //Save data for tooltip
               vuedata.tooltipData[iso2].flaggedPercentage = flaggedPercentage.toFixed(0) + "%";
               var valueToUse = flaggedPercentage;
+              /*
               var mapColorScale = d3.scaleLinear()
                 .domain([0, 30, 50, 80, 100])
                 .range(['#117a8b', '#ff7a73', '#df3152', '#A1022F', '#500118']);
+                */
+              var mapColorScale = d3.scaleLinear()
+                //.domain([0, 10, 30, 50, 65, 80, 100])
+                .domain([0, 50, 65, 80, 100])
+                .range(['#79c5d2', '#da8f9f', '#df3152', '#A1022F', '#500118']);
+                //.range(['#117a8b', '#877a7f', '#d49899', '#df3152', '#A1022F', '#500118']);
+              //cb7a79
+              //.range(['#117a8b', '#877a7f', '#ff7a73', '#df3152', '#A1022F', '#500118']);
               if(valueToUse < 10) {
                 return vuedata.colors.flagsMap[0];
               } else {
@@ -753,7 +780,11 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
         function selectCountry(iso2) {
           vuedata.selectedCountry = iso2;
           vuedata.selectedCity = {};
-          vuedata.infoboxTitle = iso2;
+          vuedata.infoboxTitle =  iso2;
+          var cname = _.find(countriesNames, function(c){ return c.Code == iso2; });
+          if(cname) {
+            vuedata.infoboxTitle =  cname.Name;
+          }
           $('.institution-list-el').removeClass('selected');
           searchDimension.filter(function(d) { 
             return d.indexOf("iso2:" + iso2.toLowerCase()) !== -1;
@@ -864,19 +895,26 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
             .attr("d", path)
           //Mouse events
           .on("mouseover", function(d) {
-            var countryVal = vuedata.tooltipData[d.properties.iso_a2];
+            var iso2 = d.properties.iso_a2;
+            var countryVal = vuedata.tooltipData[iso2];
+            var cname = _.find(countriesNames, function(c){ return c.Code == iso2; });
             mapTooltip
               .html(function(a) {
-                if(countryVal) {
-                  var iso2 = d.properties.iso_a2;
-                  var tooltipHtml = "<div class='tooltip-title'>" + iso2 + "</div>";
-                  if(vuedata.tooltipData[iso2].tendersNum) { tooltipHtml += "<div class='tooltip-info'>Total tenders: " + vuedata.tooltipData[iso2].tendersNum + "</div>"; }
-                  if(vuedata.tooltipData[iso2].flaggedTendersNum) { tooltipHtml += "<div class='tooltip-info'>Flagged tenders: " + vuedata.tooltipData[iso2].flaggedTendersNum + "</div>"; }
-                  if(vuedata.tooltipData[iso2].flagsNum) { tooltipHtml += "<div class='tooltip-info'>Total flags: " + vuedata.tooltipData[iso2].flagsNum + "</div>"; }
-                  if(vuedata.tooltipData[iso2].flaggedPercentage) { tooltipHtml += "<div class='tooltip-info'>Percentage of flagged tenders: " + vuedata.tooltipData[iso2].flaggedPercentage + "</div>"; }
-                  return tooltipHtml;
+                if(cname) {
+                  if(countryVal) {
+                    var tooltipHtml = "<div class='tooltip-title'>" + cname.Name + "</div>";
+                    tooltipHtml += "<div class='tooltip-info'>Tenders: " + countryVal.tendersNum + "</div>";
+                    //if(countryVal.tendersNum) { tooltipHtml += "<div class='tooltip-info'>Tenders: " + countryVal.tendersNum + "</div>"; }
+                    if(countryVal.flaggedTendersNum) { tooltipHtml += "<div class='tooltip-info'>Flagged tenders: " + countryVal.flaggedTendersNum + "</div>"; }
+                    if(countryVal.flagsNum) { tooltipHtml += "<div class='tooltip-info'>Total flags: " + countryVal.flagsNum + "</div>"; }
+                    if(countryVal.flaggedPercentage) { tooltipHtml += "<div class='tooltip-info'>Percentage of flagged tenders: " + countryVal.flaggedPercentage + "</div>"; }
+                    return tooltipHtml;
+                  } else {
+                    return cname.Name + ": no data";
+                  }
                 } else {
-                  return d.properties.iso_a2 + ": no data";
+                  var tooltipHtml = "<div class='tooltip-title'>" + iso2 + "</div>";
+                  return tooltipHtml;
                 }
               })
               .style("left", (d3.event.pageX + 15) + "px")
@@ -903,12 +941,13 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
               .attr('transform', d3.event.transform);
             svg.selectAll("circle")
               .attr('transform', d3.event.transform)
+              .attr('stroke-width', function(d){return 1/d3.event.transform.k})
               .attr("r", function(d){return calcDotSize(d.institutions.length)/d3.event.transform.k});
             vuedata.mapZoom = d3.event.transform.k;
             //renderDots();
           });
 
-        var dotsSize = d3.scaleLinear().domain([1, 100]).range([2, 20]);
+        var dotsSize = d3.scaleLinear().domain([1, 8]).range([2, 20]);
         var calcDotSize = function(n) {
           var scaleVal = dotsSize(n);
           if(scaleVal > 40) {
@@ -922,13 +961,14 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
         dots
         .enter()
         .append("circle")
-        .attr("r", function(d){return calcDotSize (d.institutions.length)})
+        .attr("r", function(d){return calcDotSize(d.institutions.length)})
         .attr('cx', function(d){return projection([d.coordinates.lon, d.coordinates.lat])[0]})
         .attr('cy', function(d){return projection([d.coordinates.lon, d.coordinates.lat])[1]})
         //.attr('fill', function(d){return '#2a7aae'})
         //.attr('stroke', function(d){return '#0a4a74'})
         .attr('fill', function(d){return '#078298'})
         .attr('stroke', function(d){return '#076278'})
+        .attr('stroke-width', function(d){return 1})
         .style("opacity", 0.7)
         //Mouse events
         .on("mouseover", function(d) {
@@ -1092,6 +1132,7 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
           });
           var group = dimension.group().reduceSum(function (d) { return 1; });
           var sizes = calcPieSize(charts.flagsNum.divId);
+          var order = ["0","1","2","3","4","5+"];
           chart
             .width(sizes.width)
             .height(sizes.height)
@@ -1101,6 +1142,7 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
             .legend(dc.legend().x(0).y(sizes.legendY).gap(10).legendText(function(d){ return d.name + " (" + d.data + ")"; }))
             .dimension(dimension)
             .group(group)
+            .ordering(function(d) { return order.indexOf(d.key); })
             .title(function(d) {
               return d.key + " (" + d.value + ")";
             })
@@ -1114,7 +1156,11 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
             });
           chart.render();
           chart.on('filtered', function(c) {
-            updateMap(); 
+            if(chart.filters().length > 0) {
+              $('#choropleth-type-amount').click();
+            } else { 
+              updateMap(); 
+            }
           });
         }
 
@@ -1162,7 +1208,11 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
             .xAxis().ticks(4);
           chart.render();
           chart.on('filtered', function(c) {
-            updateMap(); 
+            if(chart.filters().length > 0) {
+              $('#choropleth-type-amount').click();
+            } else { 
+              updateMap(); 
+            }
           });
         }
       
@@ -1194,6 +1244,8 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
                 "targets": 2,
                 "defaultContent":"N/A",
                 "data": function(d) {
+                  var cname = _.find(countriesNames, function(c){ return c.Code == d.CY; });
+                  if(cname) { return cname.Name }
                   return d.CY;
                 }
               },
@@ -1222,7 +1274,7 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
                 "targets": 5,
                 "defaultContent":"N/A",
                 "data": function(d) {
-                  return d.DS;
+                  return d.PD;
                 }
               },
               {
@@ -1232,7 +1284,7 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
                 "defaultContent":"N/A",
                 "data": function(d) {
                   if(d.TVH) {
-                    return d.TVH;
+                    return "€ " + d.TVH;
                   }
                   return "-";
                 }
@@ -1243,7 +1295,10 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
                 "targets": 7,
                 "defaultContent":"N/A",
                 "data": function(d) {
-                  return d.flags.length;
+                  if(d.flags.length > 0) {
+                    return "<div class='table-flags-num table-flags-num-red'>" + d.flags.length + "</div>";
+                  }
+                  return "<div class='table-flags-num table-flags-num-blue'>" + d.flags.length + "</div>";
                 }
               }
             ],
@@ -1331,6 +1386,7 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
           vuedata.selectedCity = {};
           resetGraphs();
           updateMap();
+          $('#choropleth-type-percent').click();
           $('.institution-list-el').removeClass('selected');
           vuedata.infoboxTitle = "Select";
         })
@@ -1364,6 +1420,7 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
         window.onresize = function(event) {
           resizeGraphs();
         };
+      });
       });
     });
   });

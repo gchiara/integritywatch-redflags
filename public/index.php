@@ -26,10 +26,13 @@
           <div class="col-md-12">
             <div class="row">
               <!-- INFO -->
-              <div class="col-md-9 chart-col" v-if="showInfo">
+              <div class="col-md-12 chart-col" v-if="showInfo">
                 <div class="boxed-container description-container">
                   <h1>Integrity Watch: Red Flags</h1>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ante lacus, mattis eu nunc sit amet, malesuada bibendum odio. Donec mi erat, semper at volutpat et, congue quis libero. Etiam molestie pulvinar lacus a placerat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. <a href="./about.php">Read more</a></p> 
+                  <p>This user-friendly application provides a unique overview of public procurement by EU institutions and projects funded by the EU budget since the 1st of January 2017. Integrity Watch: Red Flags draws attention to potential fraud risks at the beginning and at the end of a procurement process. Contract notices and contract award notices published on the EU's Tenders Electronic Database are flagged for potential risk factors.</p>
+                  <p><strong>Please note: flagged notices do not necessarily imply corruption. They warrant further scrutiny to improve the integrity of how public authorities buy goods, services and works on our behalf.</strong></p>
+                  <p>By clicking on the graphs or the table below, you can sort notices by EU instition or national public authority disbursing EU funds, type of red flag, country, type of contract and economic sector.</p>
+                  <p><a href="./about.php">Read more</a></p> 
                   <i class="material-icons close-btn" @click="showInfo = false">close</i>
                 </div>
               </div>
@@ -58,7 +61,7 @@
                 </div>
                 <div class="toggle-cities-container">
                   <div class="toggle-cities-circle"></div>
-                  <div class="toggle-cities-text">Cities</div>
+                  <div class="toggle-cities-text">EU Institutions/Agencies Cities</div><br />
                   <button class="map-option-btn toggle-cities-btn active">Show/hide</button>
                 </div>
               </div>
@@ -69,22 +72,23 @@
               <chart-header :title="infoboxTitle" :info="'Lorem ipsum'" ></chart-header>
               <div class="selected-city-container" v-if="selectedCountry !== ''">
                 <div class="selectedarea-info-box">
-                    <div><strong>Tenders:</strong> {{ countriesStats[selectedCountry].tenders }}</div>
+                    <div><strong>Total Tenders:</strong> {{ countriesStats[selectedCountry].tenders }}</div>
                     <div><strong>Flagged Tenders:</strong> {{ countriesStats[selectedCountry].flaggedTenders }}</div>
                     <div><strong>Total flags:</strong> {{ countriesStats[selectedCountry].totFlags }}</div>
                 </div>
               </div>
               <div class="selected-city-container" v-if="selectedCity.city">
                 <div class="selectedarea-info-box">
-                    <div v-if="selectedCity.institutions"><strong>EU Institutions / Agencies:</strong> {{ selectedCity.institutions.length }}</div>
-                    <div v-if="citiesStats[selectedCity.city]"><strong>Tenders:</strong> {{ citiesStats[selectedCity.city].tenders }}</div>
+                    <div v-if="selectedCity.institutions"><strong>EU Institutions/Agencies:</strong> {{ selectedCity.institutions.length }}</div>
+                    <div v-if="citiesStats[selectedCity.city]"><strong>EU Institutions/Agencies Tenders:</strong> {{ citiesStats[selectedCity.city].tenders }}</div>
+                    <div v-if="citiesStats[selectedCity.city]"><strong>Total Tenders:</strong> {{ citiesStats[selectedCity.city].tendersTot }}</div>
                     <div v-if="citiesStats[selectedCity.city]"><strong>Flagged Tenders:</strong> {{ citiesStats[selectedCity.city].flaggedTenders }}</div>
                     <div v-if="citiesStats[selectedCity.city]"><strong>Total flags:</strong> {{ citiesStats[selectedCity.city].totFlags }}</div>
                 </div>
               </div>
               <div class="selected-city-container custom-scroll" v-if="selectedCity.city">
                 <div v-for="institution in selectedCity.institutions" class="institution-list-el">
-                  {{institution.OFFICIALNAME}}
+                  {{institution.name}}
                 </div>
               </div>
               <div class="chart-inner" v-if="selectedCountry == '' && !selectedCity.city">
@@ -93,26 +97,32 @@
             </div>
           </div>
           <!-- SECOND ROW -->
-          <div class="col-md-3 chart-col">
-            <div class="boxed-container chart-container meetings_5">
+          <div class="col-md-5ths chart-col">
+            <div class="boxed-container chart-container tenders_row2_charts">
               <chart-header :title="charts.ctype.title" :info="charts.ctype.info" ></chart-header>
               <div class="chart-inner" id="ctype_chart"></div>
             </div>
           </div>
-          <div class="col-md-3 chart-col">
-            <div class="boxed-container chart-container meetings_5">
+          <div class="col-md-5ths chart-col">
+            <div class="boxed-container chart-container tenders_row2_charts">
+              <chart-header :title="charts.authType.title" :info="charts.authType.info" ></chart-header>
+              <div class="chart-inner" id="authtype_chart"></div>
+            </div>
+          </div>
+          <div class="col-md-5ths chart-col">
+            <div class="boxed-container chart-container tenders_row2_charts">
               <chart-header :title="charts.sector.title" :info="charts.sector.info" ></chart-header>
               <div class="chart-inner" id="sector_chart"></div>
             </div>
           </div>
-          <div class="col-md-3 chart-col">
-            <div class="boxed-container chart-container meetings_5">
+          <div class="col-md-5ths chart-col">
+            <div class="boxed-container chart-container tenders_row2_charts">
               <chart-header :title="charts.flagsNum.title" :info="charts.flagsNum.info" ></chart-header>
               <div class="chart-inner" id="flagsnum_chart"></div>
             </div>
           </div>
-          <div class="col-md-3 chart-col">
-            <div class="boxed-container chart-container meetings_5">
+          <div class="col-md-5ths chart-col">
+            <div class="boxed-container chart-container tenders_row2_charts">
               <chart-header :title="charts.flagsType.title" :info="charts.flagsType.info" ></chart-header>
               <div class="chart-inner" id="flagstype_chart"></div>
             </div>
@@ -125,7 +135,7 @@
                 <table class="table table-hover dc-data-table" id="dc-data-table">
                   <thead>
                     <tr class="header">
-                      <th class="header">Nr</th> 
+                      <th class="header">Nr</th>
                       <th class="header">Authority Name</th>
                       <th class="header">Country</th>
                       <th class="header">Notice type and nature</th>
@@ -148,8 +158,9 @@
             <!-- Modal Header -->
             <div class="modal-header">
               <div class="modal-title">
-                <div class="modal-title-ntitle">{{ selEl.title_en }}</div>
-                <div class="modal-title-ndate">Publication date: {{ selEl.DS }}</div>
+                <div class="modal-title-ntitle" v-if="selEl.title_en">{{ selEl.title_en }}</div>
+                <div class="modal-title-ntitle" v-else>{{ selEl.title_o }}</div>
+                <div class="modal-title-ndate">Publication date: {{ selEl.PD }}</div>
               </div>
               <button type="button" class="close" data-dismiss="modal"><i class="material-icons">close</i></button>
             </div>
@@ -170,8 +181,8 @@
                   </div>
                   <div id="collapse1" class="panel-collapse show">
                     <div class="panel-body">
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.CONTRACTING_BODY.ADDRESS_CONTRACTING_BODY.OFFICIALNAME')" class="notice-detail-container">
-                        <span class="notice-detail-title">Contracting authority: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.CONTRACTING_BODY.ADDRESS_CONTRACTING_BODY.OFFICIALNAME }}</span>
+                      <div v-if="pathExists('fullData.FORM_SECTION.CONTRACTING_BODY.ADDRESS_CONTRACTING_BODY.OFFICIALNAME')" class="notice-detail-container">
+                        <span class="notice-detail-title">Contracting authority: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.CONTRACTING_BODY.ADDRESS_CONTRACTING_BODY.OFFICIALNAME }}</span>
                       </div>
                       <div v-if="pathExists('fullData.CODED_DATA_SECTION.CODIF_DATA.MA_MAIN_ACTIVITIES')" class="notice-detail-container">
                         <span class="notice-detail-title">Contracting authority main activities: </span><span class="notice-detail-text">{{ selEl.fullData.CODED_DATA_SECTION.CODIF_DATA.MA_MAIN_ACTIVITIES }}</span>
@@ -180,7 +191,7 @@
                         <span class="notice-detail-title">Contracting authority country: </span><span class="notice-detail-text">{{ selEl.fullData.CODED_DATA_SECTION.NOTICE_DATA.ISO_COUNTRY['@attributes'].VALUE }}</span>
                       </div>
                       <div v-if="pathExists('fullData.CODED_DATA_SECTION.CODIF_DATA.PR_PROC')" class="notice-detail-container">
-                        <span class="notice-detail-title">Contracting authority website: </span><span class="notice-detail-text">{{ selEl.fullData.CODED_DATA_SECTION.CODIF_DATA.PR_PROC }}</span>
+                        <span class="notice-detail-title">Procedure type: </span><span class="notice-detail-text">{{ selEl.fullData.CODED_DATA_SECTION.CODIF_DATA.PR_PROC }}</span>
                       </div>
                       <div v-if="pathExists('fullData.CODED_DATA_SECTION.NOTICE_DATA.ISO_COUNTRY.@attributes.IA_URL_GENERAL')" class="notice-detail-container">
                         <span class="notice-detail-title">Procedure type: </span><span class="notice-detail-text">{{ selEl.fullData.CODED_DATA_SECTION.NOTICE_DATA.ISO_COUNTRY['@attributes'].IA_URL_GENERAL }}</span>
@@ -195,11 +206,14 @@
                         <span class="notice-detail-title">Award criteria: </span><span class="notice-detail-text">{{ selEl.fullData.CODED_DATA_SECTION.CODIF_DATA.AC_AWARD_CRIT }}</span>
                       </div>
                       <!-- tofix -->
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.VAL_ESTIMATED_TOTAL')" class="notice-detail-container">
-                        <span class="notice-detail-title">Estimated contract value: </span><span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.VAL_ESTIMATED_TOTAL) }} €</span>
+                      <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.VAL_ESTIMATED_TOTAL')" class="notice-detail-container">
+                        <span class="notice-detail-title">Estimated contract value: </span>
+                        <span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.VAL_ESTIMATED_TOTAL) }} €</span>
                       </div>
-                      <div v-else-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.VAL_TOTAL')" class="notice-detail-container">
-                        <span class="notice-detail-title">Estimated contract value: </span><span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.VAL_TOTAL) }} €</span>
+                      <div v-else-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.VAL_TOTAL')" class="notice-detail-container">
+                        <span class="notice-detail-title" v-if="selEl.fullData.CODED_DATA_SECTION.CODIF_DATA.TD_DOCUMENT_TYPE == 'Contract notice'">Estimated contract value: </span>
+                        <span class="notice-detail-title" v-else>Final contract value: </span>
+                        <span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.VAL_TOTAL) }} €</span>
                       </div>
                       <div v-if="pathExists('fullData.CODED_DATA_SECTION.NOTICE_DATA.URI_LIST.URI_DOC')" class="notice-detail-container">
                         <span class="notice-detail-title">Original TED notice: </span><span class="notice-detail-text" v-html="findTedUrl(selEl.fullData.CODED_DATA_SECTION.NOTICE_DATA.URI_LIST.URI_DOC)"></span>
@@ -216,11 +230,11 @@
                   </div>
                   <div id="collapse2" class="panel-collapse collapse">
                     <div class="panel-body">
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.TITLE.P')" class="notice-detail-container">
-                        <span class="notice-detail-title">Contract title: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.TITLE.P }}</span>
+                      <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.TITLE.P')" class="notice-detail-container">
+                        <span class="notice-detail-title">Contract title: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.TITLE.P }}</span>
                       </div>
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.SHORT_DESCR.P')" class="notice-detail-container">
-                        <span class="notice-detail-title">Short description: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.SHORT_DESCR.P.toString() }}</span>
+                      <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.SHORT_DESCR.P')" class="notice-detail-container">
+                        <span class="notice-detail-title">Short description: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.SHORT_DESCR.P.toString() }}</span>
                       </div>
                       <!-- tofix -->
                       <div v-if="pathExists('fullData.CODED_DATA_SECTION.NOTICE_DATA.VALUES.VAL_ESTIMATED_TOTAL')" class="notice-detail-container">
@@ -230,16 +244,16 @@
                       <div v-if="pathExists('fullData.CODED_DATA_SECTION.NOTICE_DATA.VALUES.VALUE')" class="notice-detail-container">
                         <span class="notice-detail-title">Estimated contract value: </span><span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.CODED_DATA_SECTION.NOTICE_DATA.VALUES.VALUE) }} €</span>
                       </div>
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.CPV_MAIN.CPV_CODE.@attributes.CODE')" class="notice-detail-container">
-                        <span class="notice-detail-title">CPV code: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.CPV_MAIN.CPV_CODE['@attributes'].CODE }}</span>
+                      <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.CPV_MAIN.CPV_CODE.@attributes.CODE')" class="notice-detail-container">
+                        <span class="notice-detail-title">CPV code: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.CPV_MAIN.CPV_CODE['@attributes'].CODE }}</span>
                       </div>
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR')" class="notice-detail-container">
+                      <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR')" class="notice-detail-container">
                         <span class="notice-detail-title">N° of lots: </span>
-                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR)">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.length }}</span>
+                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR)">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.length }}</span>
                         <span class="notice-detail-text" v-else>1</span>
                         <!-- Multiple lot -->
-                        <div class="notice-lots-container" v-if="Array.isArray(selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR)">
-                          <div class="notice-lot-box" v-for="lot in selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR">
+                        <div class="notice-lots-container" v-if="Array.isArray(selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR)">
+                          <div class="notice-lot-box" v-for="lot in selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR">
                             <div v-if="lot.LOT_NO" class="notice-detail-container">
                               <span class="notice-detail-title">Lot number: </span><span class="notice-detail-text">{{ lot.LOT_NO }}</span>
                             </div>
@@ -262,23 +276,23 @@
                         </div>
                         <!-- Single lot -->
                         <div class="notice-lot-box notice-lot-box-single" v-else>
-                          <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.LOT_NO')" class="notice-detail-container">
-                            <span class="notice-detail-title">Lot number: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.LOT_NO }}</span>
+                          <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.LOT_NO')" class="notice-detail-container">
+                            <span class="notice-detail-title">Lot number: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.LOT_NO }}</span>
                           </div>
-                          <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.TITLE.P')" class="notice-detail-container">
-                            <span class="notice-detail-title">Lot title: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.TITLE.P }}</span>
+                          <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.TITLE.P')" class="notice-detail-container">
+                            <span class="notice-detail-title">Lot title: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.TITLE.P }}</span>
                           </div>
-                          <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.SHORT_DESCR.P')" class="notice-detail-container">
-                            <span class="notice-detail-title">Lot description: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.SHORT_DESCR.P.toString() }}</span>
+                          <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.SHORT_DESCR.P')" class="notice-detail-container">
+                            <span class="notice-detail-title">Lot description: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.SHORT_DESCR.P.toString() }}</span>
                           </div>
-                          <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.MAIN_SITE.P')" class="notice-detail-container">
-                            <span class="notice-detail-title">Place of performance: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.MAIN_SITE.P.toString() }}</span>
+                          <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.MAIN_SITE.P')" class="notice-detail-container">
+                            <span class="notice-detail-title">Place of performance: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.MAIN_SITE.P.toString() }}</span>
                           </div>
-                          <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.DURATION')" class="notice-detail-container">
-                            <span class="notice-detail-title">Contract duration: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.DURATION }}</span>
+                          <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.DURATION')" class="notice-detail-container">
+                            <span class="notice-detail-title">Contract duration: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.DURATION }}</span>
                           </div>
-                          <div v-if="pathExists('fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.RENEWAL')" class="notice-detail-container">
-                            <span class="notice-detail-title">Number of renewals: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.OBJECT_CONTRACT.OBJECT_DESCR.RENEWAL }}</span>
+                          <div v-if="pathExists('fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.RENEWAL')" class="notice-detail-container">
+                            <span class="notice-detail-title">Number of renewals: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.OBJECT_CONTRACT.OBJECT_DESCR.RENEWAL }}</span>
                           </div>
                         </div>
                       </div>
@@ -294,35 +308,35 @@
                   </div>
                   <div id="collapse3" class="panel-collapse collapse">
                     <div class="panel-body">
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.LEFTI.PERFORMANCE_STAFF_QUALIFICATION')" class="notice-detail-container">
+                      <div v-if="pathExists('fullData.FORM_SECTION.LEFTI.PERFORMANCE_STAFF_QUALIFICATION')" class="notice-detail-container">
                         <span class="notice-detail-title">Personal situation: </span>
-                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION_EN.LEFTI.PERFORMANCE_STAFF_QUALIFICATION) && selEl.fullData.FORM_SECTION_EN.LEFTI.PERFORMANCE_STAFF_QUALIFICATION.length == 0">Selection criteria as stated in the procurement documents</span>
-                        <span class="notice-detail-text" v-else>{{ selEl.fullData.FORM_SECTION_EN.LEFTI.PERFORMANCE_STAFF_QUALIFICATION }}</span>
+                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION.LEFTI.PERFORMANCE_STAFF_QUALIFICATION) && selEl.fullData.FORM_SECTION.LEFTI.PERFORMANCE_STAFF_QUALIFICATION.length == 0">Selection criteria as stated in the procurement documents</span>
+                        <span class="notice-detail-text" v-else>{{ selEl.fullData.FORM_SECTION.LEFTI.PERFORMANCE_STAFF_QUALIFICATION }}</span>
                       </div>
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.LEFTI.ECONOMIC_CRITERIA_DOC')" class="notice-detail-container">
+                      <div v-if="pathExists('fullData.FORM_SECTION.LEFTI.ECONOMIC_CRITERIA_DOC')" class="notice-detail-container">
                         <span class="notice-detail-title">Financial ability: </span>
-                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION_EN.LEFTI.ECONOMIC_CRITERIA_DOC) && selEl.fullData.FORM_SECTION_EN.LEFTI.ECONOMIC_CRITERIA_DOC.length == 0">Selection criteria as stated in the procurement documents</span>
-                        <span class="notice-detail-text" v-else>{{ selEl.fullData.FORM_SECTION_EN.LEFTI.ECONOMIC_CRITERIA_DOC }}</span>
+                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION.LEFTI.ECONOMIC_CRITERIA_DOC) && selEl.fullData.FORM_SECTION.LEFTI.ECONOMIC_CRITERIA_DOC.length == 0">Selection criteria as stated in the procurement documents</span>
+                        <span class="notice-detail-text" v-else>{{ selEl.fullData.FORM_SECTION.LEFTI.ECONOMIC_CRITERIA_DOC }}</span>
                       </div>
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.LEFTI.TECHNICAL_CRITERIA_DOC')" class="notice-detail-container">
+                      <div v-if="pathExists('fullData.FORM_SECTION.LEFTI.TECHNICAL_CRITERIA_DOC')" class="notice-detail-container">
                         <span class="notice-detail-title">Technical capacity: </span>
-                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION_EN.LEFTI.TECHNICAL_CRITERIA_DOC) && selEl.fullData.FORM_SECTION_EN.LEFTI.TECHNICAL_CRITERIA_DOC.length == 0">Selection criteria as stated in the procurement documents</span>
-                        <span class="notice-detail-text" v-else>{{ selEl.fullData.FORM_SECTION_EN.LEFTI.TECHNICAL_CRITERIA_DOC }}</span>
+                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION.LEFTI.TECHNICAL_CRITERIA_DOC) && selEl.fullData.FORM_SECTION.LEFTI.TECHNICAL_CRITERIA_DOC.length == 0">Selection criteria as stated in the procurement documents</span>
+                        <span class="notice-detail-text" v-else>{{ selEl.fullData.FORM_SECTION.LEFTI.TECHNICAL_CRITERIA_DOC }}</span>
                       </div>
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.LEFTI.ECONOMICAL_FINANCIAL_INFO.P')" class="notice-detail-container">
-                        <span class="notice-detail-title">Economic & financial info: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.LEFTI.ECONOMICAL_FINANCIAL_INFO.P }}</span>
+                      <div v-if="pathExists('fullData.FORM_SECTION.LEFTI.ECONOMICAL_FINANCIAL_INFO.P')" class="notice-detail-container">
+                        <span class="notice-detail-title">Economic & financial info: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.LEFTI.ECONOMICAL_FINANCIAL_INFO.P }}</span>
                       </div>
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.LEFTI.TECHNICAL_PROFESSIONAL_INFO.P')" class="notice-detail-container">
-                        <span class="notice-detail-title">Technical professional info: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.LEFTI.TECHNICAL_PROFESSIONAL_INFO.P }}</span>
+                      <div v-if="pathExists('fullData.FORM_SECTION.LEFTI.TECHNICAL_PROFESSIONAL_INFO.P')" class="notice-detail-container">
+                        <span class="notice-detail-title">Technical professional info: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.LEFTI.TECHNICAL_PROFESSIONAL_INFO.P }}</span>
                       </div>
-                      <div v-if="pathExists('fullData.FORM_SECTION_EN.LEFTI.PERFORMANCE_CONDITIONS.P')" class="notice-detail-container">
-                        <span class="notice-detail-title">Performance conditions: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.LEFTI.PERFORMANCE_CONDITIONS.P }}</span>
+                      <div v-if="pathExists('fullData.FORM_SECTION.LEFTI.PERFORMANCE_CONDITIONS.P')" class="notice-detail-container">
+                        <span class="notice-detail-title">Performance conditions: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.LEFTI.PERFORMANCE_CONDITIONS.P }}</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 <!-- BLOCK 4 for award noticed only -->
-                <div class="panel panel-default" v-if="pathExists('fullData.FORM_SECTION_EN.AWARD_CONTRACT')">
+                <div class="panel panel-default" v-if="pathExists('fullData.FORM_SECTION.AWARD_CONTRACT')">
                   <div class="panel-heading">
                     <div class="panel-title">
                       <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">Contract award details</a>
@@ -331,8 +345,8 @@
                   <div id="collapse4" class="panel-collapse collapse">
                     <div class="panel-body">
                       <!-- Multiple lot -->
-                      <div class="notice-lots-container" v-if="Array.isArray(selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT)">
-                        <div class="notice-lot-box" v-for="lot in selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT">
+                      <div class="notice-lots-container" v-if="Array.isArray(selEl.fullData.FORM_SECTION.AWARD_CONTRACT)">
+                        <div class="notice-lot-box" v-for="lot in selEl.fullData.FORM_SECTION.AWARD_CONTRACT">
                           <div v-if="lot.TITLE && lot.TITLE.P" class="notice-detail-container">
                             <span class="notice-detail-title">Contract title: </span><span class="notice-detail-text">{{ lot.TITLE.P.toString() }}</span>
                           </div>
@@ -354,35 +368,35 @@
                           <div v-else-if="pathExistsLot('AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL',lot)" class="notice-detail-container">
                             <span class="notice-detail-title">Final contract value: </span><span class="notice-detail-text" v-if="lot.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL.LOW">{{ addThousandsSeparator(lot.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL.LOW) }} €</span> - <span class="notice-detail-text" v-if="lot.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL.HIGH">{{ addThousandsSeparator(lot.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL.HIGH) }} €</span>
                           </div>
-                          <div v-if="pathExists('fullData.FORM_SECTION_EN.PROCEDURE.FRAMEWORK')" class="notice-detail-container">
+                          <div v-if="pathExists('fullData.FORM_SECTION.PROCEDURE.FRAMEWORK')" class="notice-detail-container">
                             <span class="notice-detail-title">Contract type: </span><span class="notice-detail-text">Framework contract</span>
                           </div>
                         </div>
                       </div>
                       <!-- Single lot -->
                       <div class="notice-lot-box notice-lot-box-single" v-else>
-                        <div v-if="pathExists('fullData.FORM_SECTION_EN.AWARD_CONTRACT.TITLE.P')" class="notice-detail-container">
-                          <span class="notice-detail-title">Contract title: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT.TITLE.P.toString() }}</span>
+                        <div v-if="pathExists('fullData.FORM_SECTION.AWARD_CONTRACT.TITLE.P')" class="notice-detail-container">
+                          <span class="notice-detail-title">Contract title: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.AWARD_CONTRACT.TITLE.P.toString() }}</span>
                         </div>
-                        <div v-if="pathExists('fullData.FORM_SECTION_EN.AWARD_CONTRACT.@attributes.LOT_NO')" class="notice-detail-container">
-                          <span class="notice-detail-title">Lot number: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT['@attributes'].LOT_NO }}</span>
+                        <div v-if="pathExists('fullData.FORM_SECTION.AWARD_CONTRACT.@attributes.LOT_NO')" class="notice-detail-container">
+                          <span class="notice-detail-title">Lot number: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.AWARD_CONTRACT['@attributes'].LOT_NO }}</span>
                         </div>
-                        <div v-if="pathExists('fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.CONTRACTORS.CONTRACTOR.ADDRESS_CONTRACTOR.OFFICIALNAME')" class="notice-detail-container">
-                          <span class="notice-detail-title">Contractor(s) name: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.CONTRACTORS.CONTRACTOR.ADDRESS_CONTRACTOR.OFFICIALNAME }}</span>
+                        <div v-if="pathExists('fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.CONTRACTORS.CONTRACTOR.ADDRESS_CONTRACTOR.OFFICIALNAME')" class="notice-detail-container">
+                          <span class="notice-detail-title">Contractor(s) name: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.CONTRACTORS.CONTRACTOR.ADDRESS_CONTRACTOR.OFFICIALNAME }}</span>
                         </div>
-                        <div v-if="pathExists('fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.TENDERS.NB_TENDERS_RECEIVED')" class="notice-detail-container">
-                          <span class="notice-detail-title">N° of tenders recieved: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.TENDERS.NB_TENDERS_RECEIVED }}</span>
+                        <div v-if="pathExists('fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.TENDERS.NB_TENDERS_RECEIVED')" class="notice-detail-container">
+                          <span class="notice-detail-title">N° of tenders recieved: </span><span class="notice-detail-text">{{ selEl.fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.TENDERS.NB_TENDERS_RECEIVED }}</span>
                         </div>
-                        <div v-if="pathExists('fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_ESTIMATED_TOTAL')" class="notice-detail-container">
-                          <span class="notice-detail-title">Estimated contract value: </span><span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_ESTIMATED_TOTAL) }} €</span>
+                        <div v-if="pathExists('fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_ESTIMATED_TOTAL')" class="notice-detail-container">
+                          <span class="notice-detail-title">Estimated contract value: </span><span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_ESTIMATED_TOTAL) }} €</span>
                         </div>
-                        <div v-if="pathExists('fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_TOTAL')" class="notice-detail-container">
-                          <span class="notice-detail-title">Final contract value: </span><span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_TOTAL) }} €</span>
+                        <div v-if="pathExists('fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_TOTAL')" class="notice-detail-container">
+                          <span class="notice-detail-title">Final contract value: </span><span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_TOTAL) }} €</span>
                         </div>
-                        <div v-if="pathExists('fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL')" class="notice-detail-container">
-                          <span class="notice-detail-title">Final contract value: </span><span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL.LOW) }} €</span> - <span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION_EN.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL.HIGH) }} €</span>
+                        <div v-if="pathExists('fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL')" class="notice-detail-container">
+                          <span class="notice-detail-title">Final contract value: </span><span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL.LOW) }} €</span> - <span class="notice-detail-text">{{ addThousandsSeparator(selEl.fullData.FORM_SECTION.AWARD_CONTRACT.AWARDED_CONTRACT.VALUES.VAL_RANGE_TOTAL.HIGH) }} €</span>
                         </div>
-                        <div v-if="pathExists('fullData.FORM_SECTION_EN.PROCEDURE.FRAMEWORK')" class="notice-detail-container">
+                        <div v-if="pathExists('fullData.FORM_SECTION.PROCEDURE.FRAMEWORK')" class="notice-detail-container">
                           <span class="notice-detail-title">Contract type: </span><span class="notice-detail-text">Framework contract</span>
                         </div>
                       </div>
@@ -390,7 +404,7 @@
                   </div>
                 </div>
                 <!-- BLOCK 5 -->
-                <div class="panel panel-default" v-if="pathExists('fullData.FORM_SECTION_EN.COMPLEMENTARY_INFO.INFO_ADD.P')">
+                <div class="panel panel-default" v-if="pathExists('fullData.FORM_SECTION.COMPLEMENTARY_INFO.INFO_ADD.P')">
                   <div class="panel-heading">
                     <div class="panel-title">
                       <a data-toggle="collapse" data-parent="#accordion" href="#collapse5">Complementary information</a>
@@ -400,8 +414,8 @@
                     <div class="panel-body">
                       <div class="notice-detail-container">
                         <span class="notice-detail-title">Complementary information: </span>
-                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION_EN.COMPLEMENTARY_INFO.INFO_ADD.P)">{{ selEl.fullData.FORM_SECTION_EN.COMPLEMENTARY_INFO.INFO_ADD.P.join(", ") }}</span>
-                        <span class="notice-detail-text" v-else>{{ selEl.fullData.FORM_SECTION_EN.COMPLEMENTARY_INFO.INFO_ADD.P }}</span>
+                        <span class="notice-detail-text" v-if="Array.isArray(selEl.fullData.FORM_SECTION.COMPLEMENTARY_INFO.INFO_ADD.P)">{{ selEl.fullData.FORM_SECTION.COMPLEMENTARY_INFO.INFO_ADD.P.join(", ") }}</span>
+                        <span class="notice-detail-text" v-else>{{ selEl.fullData.FORM_SECTION.COMPLEMENTARY_INFO.INFO_ADD.P }}</span>
                       </div>
                     </div>
                   </div>
@@ -430,7 +444,7 @@
         <button class="reset-btn"><i class="material-icons">settings_backup_restore</i><span class="reset-btn-text">Reset filters</span></button>
       </div>
       <!-- Loader -->
-      <loader v-if="loader" :text="'Lorem Ipsum'" />
+      <loader v-if="loader" :text="loaderText" />
     </div>
 
     <script type="text/javascript" src="vendor/js/d3.v5.min.js"></script>
@@ -440,7 +454,7 @@
     <script type="text/javascript" src="vendor/js/d3-geo-projection.v2.min.js"></script>
     <script type="text/javascript" src="vendor/js/d3-scale-chromatic.v0.3.min.js"></script>
 
-    <script src="static/tenders.js"></script>
+    <script src="static/tenders-eu.js"></script>
 
  
 </body>

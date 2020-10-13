@@ -48,7 +48,7 @@ export default {
       animation: spin 2s linear infinite;
     }
     .loader-text {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
       &.below {
         color: #138496;

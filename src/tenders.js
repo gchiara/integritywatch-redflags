@@ -325,9 +325,7 @@ new Vue({
       for (var i = 0; i < args.length; i++) {
         if(currentPath[args[i]]) {
           currentPath = currentPath[args[i]];
-          //console.log(currentPath);
         } else {
-          //console.log("path not found: " + args[i] + " Full: " + pathString);
           return false;
         }
       }
@@ -339,10 +337,7 @@ new Vue({
       for (var i = 0; i < args.length; i++) {
         if(currentPath[args[i]]) {
           currentPath = currentPath[args[i]];
-          //console.log("lotPATH: ");
-          //console.log(currentPath);
         } else {
-          //console.log("path not found: " + args[i] + " Full: " + pathString);
           return false;
         }
       }
@@ -362,13 +357,10 @@ new Vue({
       return false;
     },
     findTedUrl: function(uriList) {
-      console.log("Url function");
-      console.log(uriList);
       var html = "ttt";
       if(uriList && Array.isArray(uriList) && uriList.length > 0) {
         _.each(uriList, function (url) {
           if(url.indexOf(":TEXT:EN:HTML") > -1) {
-            console.log(url);
             html = "<a href='" + url + "' target='_blank'>" + url + "</a>";
           }
         });
@@ -557,7 +549,7 @@ var sectorCodesFile = './data/CPV_codes.csv';
 //Load tenders data
 json(tendersDataFile + '?' + randomPar, (err, tenders) => {
   json(citiesDataFile + '?' + randomPar, (err, cities) => {
-    json(europeMap, (err, europeGeojson) => {
+    json(europeMap + '?' + randomPar, (err, europeGeojson) => {
       csv(sectorCodesFile, (err, sectorCodes) => {
         if (err) {
           console.error(err)
@@ -582,6 +574,23 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
           }
           //Save cities and countries stats
           //countriesStats, citiesStats
+          if(d.cb_town && d.cb_name_fixed) {
+            if(d.cb_town == "Warsaw") {
+              console.log(d);
+            }
+            if(!vuedata.citiesStats[d.cb_town]) {
+              vuedata.citiesStats[d.cb_town] = {
+                tenders: 0,
+                flaggedTenders: 0,
+                totFlags: 0
+              }
+            }
+            vuedata.citiesStats[d.cb_town].tenders ++;
+            vuedata.citiesStats[d.cb_town].totFlags += d.flags.length;
+            if(d.flags.length > 0) {
+              vuedata.citiesStats[d.cb_town].flaggedTenders ++;
+            }
+          }
           if(!vuedata.countriesStats[d.CY]) {
             vuedata.countriesStats[d.CY] = {
               tenders: 0,
@@ -589,22 +598,12 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
               totFlags: 0
             }
           }
-          if(!vuedata.citiesStats[d.cb_town]) {
-            vuedata.citiesStats[d.cb_town] = {
-              tenders: 0,
-              flaggedTenders: 0,
-              totFlags: 0
-            }
-          }
-          vuedata.citiesStats[d.cb_town].tenders ++;
           vuedata.countriesStats[d.CY].tenders ++;
           if(d.flags.length > 0) {
             vuedata.citiesStats[d.cb_town].flaggedTenders ++;
             vuedata.countriesStats[d.CY].flaggedTenders ++;
           }
-          vuedata.citiesStats[d.cb_town].totFlags += d.flags.length;
           vuedata.countriesStats[d.CY].totFlags += d.flags.length;
-          //console.log(d.tender_file_uid + " - " + d.flags);
           //Codes and acroynms
           d.authorityType = vuedata.codes.AA[d.AA];
           d.awardCriteria = vuedata.codes.AC[d.AC];
@@ -685,7 +684,6 @@ json(tendersDataFile + '?' + randomPar, (err, tenders) => {
             vuedata.tooltipData[iso2].tendersNum = tendersNum;
             vuedata.tooltipData[iso2].flaggedTendersNum = flaggedTendersNum;
             vuedata.tooltipData[iso2].flagsNum = flagsNum;
-            console.log(iso2 + ": Tenders:" + tendersNum + " - Flags:" + flagsNum + " Flagged tenders: " + flaggedTendersNum);
             if(vuedata.choroplethType == 'percentFlagged') {
               //Calc percentage of flags
               var flagsPercentage = (flagsNum*100)/tendersNum;
